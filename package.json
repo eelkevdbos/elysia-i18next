@@ -1,0 +1,39 @@
+{
+  "name": "elysia-i18next",
+  "version": "1.0.2",
+  "description": "I18n for Elysia.js via i18next",
+  "repository": "https://github.com/eelkevdbos/elysia-i18next",
+  "author": {
+    "name": "eelkevdbos",
+    "url": "https://github.com/eelkevdbos",
+    "email": "eelke@vandenbos.dev"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc --project tsconfig.esm.json"
+  },
+  "exports": {
+    "require": "./dist/index.js",
+    "import": "./dist/index.js",
+    "node": "./dist/index.js",
+    "default": "./dist/index.js"
+  },
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "keywords": [
+    "elysia",
+    "i18n"
+  ],
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "bun-types": "latest",
+    "elysia": "latest",
+    "i18next": "^23.5.1",
+    "prettier": "^3.0.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0",
+    "elysia": "^0.8.1",
+    "i18next": "^23.5.1"
+  }
+}
