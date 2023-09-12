@@ -72,6 +72,15 @@ describe('i18next', () => {
     expect(await response.text()).toEqual('Bonjour!')
   })
 
+  it('changes language based on cookie', async () => {
+    const app = new Elysia()
+      .derive(() => ({ cookie: { lang: 'fr' } }))
+      .use(i18next({ initOptions }))
+      .get('/', ({ t }) => t('greeting'))
+    const response = await app.handle(req('/'))
+    expect(await response.text()).toEqual('Bonjour!')
+  })
+
   it('accepts an i18next instance', async () => {
     const instance = createInstance({
       ...initOptions,

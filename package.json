@@ -1,6 +1,6 @@
 {
   "name": "elysia-i18next",
-  "version": "2.0.0-pre.1",
+  "version": "2.0.0",
   "description": "I18n for Elysia.js via i18next",
   "repository": "https://github.com/eelkevdbos/elysia-i18next",
   "author": {
@@ -21,7 +21,8 @@
   "files": ["dist"],
   "keywords": [
     "elysia",
-    "i18n"
+    "i18n",
+    "i18next"
   ],
   "license": "MIT",
   "dependencies": {
