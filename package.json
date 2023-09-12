@@ -9,7 +9,7 @@
     "email": "eelke@vandenbos.dev"
   },
   "scripts": {
-    "build": "rm -rf dist && tsc --project tsconfig.esm.json"
+    "build": "bun run build.ts"
   },
   "exports": {
     "require": "./dist/index.js",
@@ -24,16 +24,17 @@
     "i18n"
   ],
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "i18next": "^23.5.1"
+  },
   "devDependencies": {
+    "bun-plugin-dts": "^0.1.0",
     "bun-types": "latest",
-    "elysia": "latest",
-    "i18next": "^23.5.1",
+    "elysia": "^0.6.22",
     "prettier": "^3.0.3"
   },
   "peerDependencies": {
     "typescript": "^5.0.0",
-    "elysia": "^0.8.1",
-    "i18next": "^23.5.1"
+    "elysia": "^0.6.22"
   }
 }
