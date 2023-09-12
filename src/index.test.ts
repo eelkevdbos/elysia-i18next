@@ -37,6 +37,14 @@ describe('i18next', () => {
     expect(await response.text()).toEqual('Hallo!')
   })
 
+  it('changes language based on query parameter', async () => {
+    const app = new Elysia()
+      .use(i18next({ initOptions }))
+      .get('/', ({ t }) => t('greeting'))
+    const response = await app.handle(req('/?lang=en'))
+    expect(await response.text()).toEqual('Hello!')
+  })
+
   it('changes language based on accept-language header', async () => {
     const app = new Elysia()
       .use(i18next({ initOptions }))

@@ -1,48 +1,71 @@
-import { Elysia, PreContext } from 'elysia'
+import { Context, Elysia, TypedSchemaToRoute } from 'elysia'
 import lib, { i18n, InitOptions } from 'i18next'
 
-export const t: i18n['t'] = lib.t
-
 export type DerivedTypes = {
-  i18next: i18n
+  i18n: i18n
   t: i18n['t']
 }
 
-export type I18NextPluginOptions = {
-  initOptions: InitOptions
-  detectLanguage: <T extends PreContext>(
-    ctx: T
-  ) => null | string | Promise<string | null>
+export type LanguageDetectorOptions = {
+  storeParamName: string
+  searchParamName: string
+  headerName: string
 }
 
-export const detectLanguage = (ctx: PreContext) => {
-  if ('language' in ctx.store) {
-    return ctx.store.language as string | null
+export type LanguageDetector<
+  T extends Context<TypedSchemaToRoute<any, any>> = Context<
+    TypedSchemaToRoute<any, any>
+  >,
+> = (ctx: T) => null | string | Promise<string | null>
+
+export type I18NextPluginOptions = {
+  initOptions: InitOptions
+  detectLanguage: LanguageDetector
+}
+
+function newLanguageDetector(opts: LanguageDetectorOptions): LanguageDetector {
+  return ctx => {
+    const url = new URL(ctx.request.url)
+    if (url.searchParams.has(opts.searchParamName)) {
+      return url.searchParams.get(opts.searchParamName)
+    }
+
+    if (opts.storeParamName in ctx.store) {
+      // get opts.storeParamName from store
+      return (ctx.store as Record<string, unknown>)[opts.storeParamName] as
+        | string
+        | null
+    }
+
+    return ctx.request.headers.get(opts.headerName)
   }
-  return ctx.request.headers.get('accept-language')
 }
 
 const defaultOptions: I18NextPluginOptions = {
   initOptions: {},
-  detectLanguage,
+  detectLanguage: newLanguageDetector({
+    searchParamName: 'lang',
+    storeParamName: 'language',
+    headerName: 'accept-language',
+  }),
 }
 
 export const i18next = (userOptions: Partial<I18NextPluginOptions>) => {
-  return (app: Elysia) =>
-    app.use(
-      new Elysia({ name: 'elysia-i18next' }).derive(
-        async (ctx): Promise<DerivedTypes> => {
-          const options: I18NextPluginOptions = {
-            ...defaultOptions,
-            ...userOptions,
-          }
-          await lib.init(options.initOptions || {})
-          const lng = await options.detectLanguage<typeof ctx>(ctx)
-          if (lng) {
-            await lib.changeLanguage(lng)
-          }
-          return { i18next: lib, t: lib.t }
-        }
-      )
-    )
+  const options: I18NextPluginOptions = {
+    ...defaultOptions,
+    ...userOptions,
+  }
+
+  const plugin = new Elysia({ name: 'elysia-i18next' }).derive(
+    async (ctx): Promise<DerivedTypes> => {
+      await lib.init(options.initOptions || {})
+      const lng = await options.detectLanguage(ctx)
+      if (lng) {
+        await lib.changeLanguage(lng)
+      }
+      return { i18n: lib, t: lib.t }
+    }
+  )
+
+  return (app: Elysia) => app.use(plugin)
 }
