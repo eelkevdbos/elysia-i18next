@@ -16,14 +16,14 @@ Usage
 Check out full samples at [`examples`](./examples/) or check out the tests [`tests`](src/index.test.ts).
 
 ```ts
-import {Elysia} from 'elysia'
-import {i18next} from 'elysia-i18next'
+import { Elysia } from "elysia";
+import { i18next } from "elysia-i18next";
 
 new Elysia()
   .use(
     i18next({
       initOptions: {
-        lng: 'nl',
+        lng: "nl",
         resources: {
           en: {
             translation: {
@@ -36,11 +36,11 @@ new Elysia()
             },
           },
         },
-      }
-    })
+      },
+    }),
   )
-  .get('/', ({t}) => t('greeting')) // returns "Hallo"
-  .listen(3000)
+  .get("/", ({ t }) => t("greeting")) // returns "Hallo"
+  .listen(3000);
 ```
 
 Configuration
@@ -56,16 +56,25 @@ Check out the [i18next documentation](https://www.i18next.com/overview/configura
 
 ### detectLanguage
 
-`(ctx: PreContext) => string`
+`LanguageDetector`
 
 default:
 ```ts
-(ctx: PreContext) => {
-  if ('language' in ctx.store) {
-    return ctx.store.language as string | null
-  }
-  return ctx.request.headers.get('accept-language')
-}
+newLanguageDetector({
+  searchParamName: 'lang',
+  storeParamName: 'language',
+  headerName: 'accept-language',
+  cookieName: 'lang',
+  pathParamName: 'lang',
+})
 ```
 
-A language detection function, by default it checks the `language` property on the store, or the `accept-language` header.
+A language detection function based on the current request context. By default, it checks the `language` property on the store, `lang` param in the query string, a cookie named `lang`, a path parameter named `lang` or the `accept-language` header.
+
+### instance
+
+`null | i18next.i18n`
+
+Default: `null`
+
+An existing i18next instance. If not provided, the global (module level) i18next instance will be used. The instance will be initialized if it not already was initialized.
