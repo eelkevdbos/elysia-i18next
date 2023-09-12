@@ -1,9 +1,15 @@
 import { Context, Elysia, TypedSchemaToRoute } from 'elysia'
 import lib, { i18n, InitOptions } from 'i18next'
 
-export type DerivedTypes = {
+export type I18NextRequest = {
   i18n: i18n
   t: i18n['t']
+}
+
+export type I18NextPluginOptions = {
+  initOptions: InitOptions
+  detectLanguage: LanguageDetector
+  instance: null | i18n
 }
 
 export type LanguageDetectorOptions = {
@@ -17,11 +23,6 @@ export type LanguageDetector<
     TypedSchemaToRoute<any, any>
   >,
 > = (ctx: T) => null | string | Promise<string | null>
-
-export type I18NextPluginOptions = {
-  initOptions: InitOptions
-  detectLanguage: LanguageDetector
-}
 
 function newLanguageDetector(opts: LanguageDetectorOptions): LanguageDetector {
   return ctx => {
@@ -42,6 +43,7 @@ function newLanguageDetector(opts: LanguageDetectorOptions): LanguageDetector {
 }
 
 const defaultOptions: I18NextPluginOptions = {
+  instance: null,
   initOptions: {},
   detectLanguage: newLanguageDetector({
     searchParamName: 'lang',
@@ -56,16 +58,18 @@ export const i18next = (userOptions: Partial<I18NextPluginOptions>) => {
     ...userOptions,
   }
 
-  const plugin = new Elysia({ name: 'elysia-i18next' }).derive(
-    async (ctx): Promise<DerivedTypes> => {
-      await lib.init(options.initOptions || {})
+  const _instance = options.instance || lib
+
+  return new Elysia({ name: 'elysia-i18next', seed: userOptions }).derive(
+    async (ctx): Promise<I18NextRequest> => {
+      if (!_instance.isInitialized) {
+        await _instance.init(options.initOptions || {})
+      }
       const lng = await options.detectLanguage(ctx)
       if (lng) {
-        await lib.changeLanguage(lng)
+        await _instance.changeLanguage(lng)
       }
-      return { i18n: lib, t: lib.t }
+      return { i18n: _instance, t: _instance.t }
     }
   )
-
-  return (app: Elysia) => app.use(plugin)
 }

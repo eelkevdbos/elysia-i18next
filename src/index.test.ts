@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test'
 import Elysia from 'elysia'
 import { i18next } from './index.ts'
-import { InitOptions } from 'i18next'
+import { createInstance, InitOptions } from 'i18next'
 
 export const req = (path: string, requestInit?: RequestInit) =>
   new Request(`http://localhost${path}`, requestInit)
@@ -67,6 +67,18 @@ describe('i18next', () => {
   it('allows to override language detection', async () => {
     const app = new Elysia()
       .use(i18next({ initOptions, detectLanguage: () => 'fr' }))
+      .get('/', ({ t }) => t('greeting'))
+    const response = await app.handle(req('/'))
+    expect(await response.text()).toEqual('Bonjour!')
+  })
+
+  it('accepts an i18next instance', async () => {
+    const instance = createInstance({
+      ...initOptions,
+      lng: 'fr',
+    })
+    const app = new Elysia()
+      .use(i18next({ instance }))
       .get('/', ({ t }) => t('greeting'))
     const response = await app.handle(req('/'))
     expect(await response.text()).toEqual('Bonjour!')

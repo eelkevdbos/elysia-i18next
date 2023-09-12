@@ -17,7 +17,6 @@
     "allowJs": true,
     "types": [
       "bun-types",
-      "i18next",
     ]
   }
 }
