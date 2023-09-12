@@ -16,25 +16,27 @@ Usage
 Check out full samples at [`examples`](./examples/) or check out the tests [`tests`](src/index.test.ts).
 
 ```ts
-import { Elysia } from 'elysia'
-import { i18next } from 'elysia-i18next'
+import {Elysia} from 'elysia'
+import {i18next} from 'elysia-i18next'
 
 new Elysia()
   .use(
     i18next({
-      lng: 'nl',
-      resources: {
-        en: {
-          translation: {
-            greeting: "Hi",
+      initOptions: {
+        lng: 'nl',
+        resources: {
+          en: {
+            translation: {
+              greeting: "Hi",
+            },
+          },
+          nl: {
+            translation: {
+              greeting: "Hallo",
+            },
           },
         },
-        nl: {
-          translation: {
-            greeting: "Hallo",
-          },
-        },
-      },
+      }
     })
   )
   .get('/', ({t}) => t('greeting')) // returns "Hallo"

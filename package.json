@@ -1,6 +1,6 @@
 {
   "name": "elysia-i18next",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "I18n for Elysia.js via i18next",
   "repository": "https://github.com/eelkevdbos/elysia-i18next",
   "author": {
