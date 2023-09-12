@@ -17,6 +17,7 @@ export type LanguageDetectorOptions = {
   searchParamName: string
   headerName: string
   cookieName: string
+  pathParamName: string
 }
 
 export type LanguageDetector<
@@ -35,6 +36,10 @@ function newLanguageDetector(opts: LanguageDetectorOptions): LanguageDetector {
     const cookie = 'cookie' in ctx ? (ctx.cookie as Record<string, string>) : {}
     if (opts.cookieName in cookie) {
       return cookie[opts.cookieName]
+    }
+
+    if (ctx.params && opts.pathParamName in ctx.params) {
+      return ctx.params[opts.pathParamName]
     }
 
     if (opts.storeParamName in ctx.store) {
@@ -56,6 +61,7 @@ const defaultOptions: I18NextPluginOptions = {
     storeParamName: 'language',
     headerName: 'accept-language',
     cookieName: 'lang',
+    pathParamName: 'lang',
   }),
 }
 

@@ -81,6 +81,15 @@ describe('i18next', () => {
     expect(await response.text()).toEqual('Bonjour!')
   })
 
+  it('changes language based on path param', async () => {
+    const app = new Elysia()
+      .use(i18next({ initOptions }))
+      .get('/:lang/', ({ t }) => t('greeting'))
+
+    const response = await app.handle(req('/fr/'))
+    expect(await response.text()).toEqual('Bonjour!')
+  })
+
   it('accepts an i18next instance', async () => {
     const instance = createInstance({
       ...initOptions,
