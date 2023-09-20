@@ -1,5 +1,6 @@
-import { Context, Elysia, TypedSchemaToRoute } from 'elysia'
+import { Context, Cookie, Elysia, RouteSchema } from 'elysia'
 import lib, { i18n, InitOptions } from 'i18next'
+import { sleep } from 'bun'
 
 export type I18NextRequest = {
   i18n: i18n
@@ -21,35 +22,35 @@ export type LanguageDetectorOptions = {
 }
 
 export type LanguageDetector<
-  T extends Context<TypedSchemaToRoute<any, any>> = Context<
-    TypedSchemaToRoute<any, any>
-  >,
+  T extends Context<RouteSchema> = Context<RouteSchema>,
 > = (ctx: T) => null | string | Promise<string | null>
 
 function newLanguageDetector(opts: LanguageDetectorOptions): LanguageDetector {
-  return ctx => {
-    const url = new URL(ctx.request.url)
-    if (url.searchParams.has(opts.searchParamName)) {
-      return url.searchParams.get(opts.searchParamName)
+  return ({ set, request, params, store }) => {
+    const url = new URL(request.url)
+
+    const searchParamValue = url.searchParams.get(opts.searchParamName)
+    if (searchParamValue) {
+      return searchParamValue
     }
 
-    const cookie = 'cookie' in ctx ? (ctx.cookie as Record<string, string>) : {}
-    if (opts.cookieName in cookie) {
-      return cookie[opts.cookieName]
+    const cookie = set.cookie ? set.cookie[opts.cookieName] : null
+    if (cookie && cookie.value) {
+      return cookie.value
     }
 
-    if (ctx.params && opts.pathParamName in ctx.params) {
-      return ctx.params[opts.pathParamName]
+    if (params && opts.pathParamName in params) {
+      return params[opts.pathParamName]
     }
 
-    if (opts.storeParamName in ctx.store) {
+    if (opts.storeParamName in store) {
       // get opts.storeParamName from store
-      return (ctx.store as Record<string, unknown>)[opts.storeParamName] as
+      return (store as Record<string, unknown>)[opts.storeParamName] as
         | string
         | null
     }
 
-    return ctx.request.headers.get(opts.headerName)
+    return request.headers.get(opts.headerName)
   }
 }
 
@@ -73,16 +74,17 @@ export const i18next = (userOptions: Partial<I18NextPluginOptions>) => {
 
   const _instance = options.instance || lib
 
-  return new Elysia({ name: 'elysia-i18next', seed: userOptions }).derive(
-    async (ctx): Promise<I18NextRequest> => {
+  return new Elysia({ name: 'elysia-i18next', seed: userOptions })
+    .derive(async (ctx): Promise<I18NextRequest> => {
       if (!_instance.isInitialized) {
         await _instance.init(options.initOptions || {})
       }
+      return { i18n: _instance, t: _instance.t }
+    })
+    .onBeforeHandle(async ctx => {
       const lng = await options.detectLanguage(ctx)
       if (lng) {
         await _instance.changeLanguage(lng)
       }
-      return { i18n: _instance, t: _instance.t }
-    }
-  )
+    })
 }
