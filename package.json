@@ -1,6 +1,6 @@
 {
   "name": "elysia-i18next",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Internationalization (i18n) for Elysia.js via i18next",
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
     "email": "eelke@vandenbos.dev"
   },
   "scripts": {
-    "build": "bun run build.ts"
+    "build": "bun run build.mjs"
   },
   "main": "./dist/index.js",
   "exports": {
@@ -31,10 +31,8 @@
     "i18next"
   ],
   "license": "MIT",
-  "dependencies": {
-    "i18next": "^23.5.1"
-  },
   "devDependencies": {
+    "i18next": "^23.5.1",
     "bun-plugin-dts": "^0.1.0",
     "bun-types": "latest",
     "elysia": "^0.7.1",

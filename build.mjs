@@ -8,10 +8,6 @@ await Bun.build({
   sourcemap: 'external',
   external: ['elysia'],
   plugins: [
-    dts({
-      libraries: {
-        inlinedLibraries: ['i18next'],
-      },
-    }),
+    dts(),
   ],
 })

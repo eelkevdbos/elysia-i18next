@@ -7,7 +7,7 @@ Install
 ---
 
 ```
-bun add elysia-i18next
+bun add elysia-i18next i18next
 ```
 
 Usage
