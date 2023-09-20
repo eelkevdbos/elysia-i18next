@@ -1,6 +1,5 @@
-import { Context, Cookie, Elysia, RouteSchema } from 'elysia'
+import { Context, Elysia, RouteSchema } from 'elysia'
 import lib, { i18n, InitOptions } from 'i18next'
-import { sleep } from 'bun'
 
 export type I18NextRequest = {
   i18n: i18n
@@ -75,7 +74,7 @@ export const i18next = (userOptions: Partial<I18NextPluginOptions>) => {
   const _instance = options.instance || lib
 
   return new Elysia({ name: 'elysia-i18next', seed: userOptions })
-    .derive(async (ctx): Promise<I18NextRequest> => {
+    .derive(async () => {
       if (!_instance.isInitialized) {
         await _instance.init(options.initOptions || {})
       }
