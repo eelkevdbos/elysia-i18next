@@ -1,6 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it } from 'bun:test'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import Elysia from 'elysia'
-import { i18next } from './index.ts'
+import { i18next, newLanguageDetector, LanguageDetector } from './index.ts'
 import { createInstance, InitOptions, i18n } from 'i18next'
 
 export const req = (path: string, requestInit?: RequestInit) =>
@@ -109,5 +109,22 @@ describe('i18next', () => {
       .get('/', ({ t }) => t('greeting'))
     const response = await app.handle(req('/'))
     expect(await response.text()).toEqual('Bonjour!')
+  })
+
+  it('changes language using a custom LanguageDetector created with newLanguageDetector()', async () => {
+    const detector: LanguageDetector = newLanguageDetector({
+      searchParamName: 'x-lang',
+      storeParamName: 'x-lang',
+      headerName: 'x-lang',
+      cookieName: 'x-lang',
+      pathParamName: 'x-lang',
+    })
+
+    const app = new Elysia()
+      .use(i18next({ instance, detectLanguage: detector }))
+      .get('/', ({ t }) => t('greeting'))
+
+    const response = await app.handle(req('/?x-lang=en'))
+    expect(await response.text()).toEqual('Hello!')
   })
 })
