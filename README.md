@@ -78,3 +78,11 @@ A language detection function based on the current request context. By default, 
 Default: `null`
 
 An existing i18next instance. If not provided, the global (module level) i18next instance will be used. The instance will be initialized if it not already was initialized.
+
+### useLngAsDefault
+
+`boolean`
+
+Default: `true`
+
+If `true`, the language will be set to `initOptions.lng` if no language was detected and `initOptions.lng` is defined. Otherwise, the previous language will be used.
