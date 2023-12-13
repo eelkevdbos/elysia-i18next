@@ -129,4 +129,21 @@ describe('i18next', () => {
     response = await app.handle(req('/'))
     expect(await response.text()).toEqual('Hello!')
   })
+
+  it('should not fall back to initOptions.lng after a request with specified language if useLngAsDefault is false', async () => {
+	  instance = createInstance({
+	  	...initOptions,
+	  	lng: 'en',
+	  })
+
+	  const app = new Elysia()
+	    .use(i18next({ instance, useLngAsDefault: false }))
+	    .get('/', ({ t }) => t('greeting'))
+
+	  let response = await app.handle(req('/?lang=fr'))
+	  expect(await response.text()).toEqual('Bonjour!')
+
+	  response = await app.handle(req('/'))
+	  expect(await response.text()).toEqual('Bonjour!')
+  })
 })
