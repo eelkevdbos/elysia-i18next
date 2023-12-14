@@ -110,4 +110,40 @@ describe('i18next', () => {
     const response = await app.handle(req('/'))
     expect(await response.text()).toEqual('Bonjour!')
   })
+
+  it('should fall back to initOptions.lng after a request with specified language', async () => {
+    instance = createInstance({
+		  ...initOptions,
+		  lng: 'en',
+	  })
+	
+	  const app = new Elysia()
+      .use(i18next({ instance }))
+      .get('/', ({ t }) => t('greeting'))
+
+	  // language is specified in the first request
+    let response = await app.handle(req('/?lang=fr'))
+    expect(await response.text()).toEqual('Bonjour!')
+
+	  // language is not specified in the next request
+    response = await app.handle(req('/'))
+    expect(await response.text()).toEqual('Hello!')
+  })
+
+  it('should not fall back to initOptions.lng after a request with specified language if useLngAsDefault is false', async () => {
+	  instance = createInstance({
+	  	...initOptions,
+	  	lng: 'en',
+	  })
+
+	  const app = new Elysia()
+	    .use(i18next({ instance, useLngAsDefault: false }))
+	    .get('/', ({ t }) => t('greeting'))
+
+	  let response = await app.handle(req('/?lang=fr'))
+	  expect(await response.text()).toEqual('Bonjour!')
+
+	  response = await app.handle(req('/'))
+	  expect(await response.text()).toEqual('Bonjour!')
+  })
 })

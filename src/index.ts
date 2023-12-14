@@ -10,6 +10,7 @@ export type I18NextPluginOptions = {
   initOptions: InitOptions
   detectLanguage: LanguageDetector
   instance: null | i18n
+  useLngAsDefault: boolean
 }
 
 export type LanguageDetectorOptions = {
@@ -63,6 +64,7 @@ const defaultOptions: I18NextPluginOptions = {
     cookieName: 'lang',
     pathParamName: 'lang',
   }),
+  useLngAsDefault: true,
 }
 
 export const i18next = (userOptions: Partial<I18NextPluginOptions>) => {
@@ -81,9 +83,16 @@ export const i18next = (userOptions: Partial<I18NextPluginOptions>) => {
       return { i18n: _instance, t: _instance.t }
     })
     .onBeforeHandle(async ctx => {
-      const lng = await options.detectLanguage(ctx)
-      if (lng) {
-        await _instance.changeLanguage(lng)
+      const detectedLanguage = await options.detectLanguage(ctx)
+      if (detectedLanguage) {
+        await _instance.changeLanguage(detectedLanguage)
+        return
       }
+
+      const { options: { lng }, language: currentLanguage } = _instance
+
+      if (options.useLngAsDefault && lng && currentLanguage !== lng) {
+        await _instance.changeLanguage(lng)
+	    }
     })
 }
