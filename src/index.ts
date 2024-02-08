@@ -24,7 +24,7 @@ export type LanguageDetector<
   T extends Context<RouteSchema> = Context<RouteSchema>,
 > = (ctx: T) => null | string | Promise<string | null>
 
-function newLanguageDetector(opts: LanguageDetectorOptions): LanguageDetector {
+export function newLanguageDetector(opts: LanguageDetectorOptions): LanguageDetector {
   return ({ set, request, params, store }) => {
     const url = new URL(request.url)
 
