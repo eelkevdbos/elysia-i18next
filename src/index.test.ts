@@ -127,4 +127,15 @@ describe('i18next', () => {
     const response = await app.handle(req('/?x-lang=en'))
     expect(await response.text()).toEqual('Hello!')
   })
+
+  it('resets language to default on every request', async () => {
+    const app = new Elysia()
+      .use(i18next({ instance }))
+      .get('/', ({ t }) => t('greeting'))
+    await app.modules
+    const responseEN = await app.handle(req('/?lang=fr'))
+    const responseNL = await app.handle(req('/'))
+    expect(await responseEN.text()).toEqual('Bonjour!')
+    expect(await responseNL.text()).toEqual('Hallo!')
+  })
 })

@@ -1,4 +1,4 @@
-import { Context, Elysia, RouteSchema } from 'elysia'
+import Elysia, { Context, RouteSchema } from 'elysia'
 import lib, { i18n, InitOptions } from 'i18next'
 
 export type I18NextRequest = {
@@ -65,25 +65,25 @@ const defaultOptions: I18NextPluginOptions = {
   }),
 }
 
-export const i18next = (userOptions: Partial<I18NextPluginOptions>) => {
-  const options: I18NextPluginOptions = {
-    ...defaultOptions,
-    ...userOptions,
-  }
-
-  const _instance = options.instance || lib
-
-  return new Elysia({ name: 'elysia-i18next', seed: userOptions })
-    .derive({ as: "global" }, async () => {
-      if (!_instance.isInitialized) {
-        await _instance.init(options.initOptions || {})
-      }
-      return { i18n: _instance, t: _instance.t }
-    })
-    .onBeforeHandle({ as: "global" }, async ctx => {
-      const lng = await options.detectLanguage(ctx)
-      if (typeof lng === 'string') {
-        await _instance.changeLanguage(lng)
-      }
-    })
+export const i18next = (userOptions: Partial<I18NextPluginOptions>) => (app: Elysia) => {
+    const options: I18NextPluginOptions = {
+      ...defaultOptions,
+      ...userOptions,
+    }
+    return app.use(new Elysia({ name: 'elysia-i18next', seed: options })
+      .derive({ as: 'global' }, async () => {
+        const _instance = options.instance || lib
+        if (!_instance.isInitialized) {
+          await _instance.init(options.initOptions)
+        }
+        const _clone = _instance.cloneInstance()
+        return { i18n: _clone, t: _clone.t }
+      })
+      .onBeforeHandle({ as: "global" }, async ctx => {
+        const lng = await options.detectLanguage(ctx)
+        if (lng) {
+          await ctx.i18n.changeLanguage(lng)
+        }
+      })
+    )
 }
