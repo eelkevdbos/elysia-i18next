@@ -1,6 +1,6 @@
 {
   "name": "elysia-i18next",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "Internationalization (i18n) for Elysia.js via i18next",
   "repository": {
     "type": "git",
