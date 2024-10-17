@@ -1,6 +1,6 @@
 {
   "name": "elysia-i18next",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "Internationalization (i18n) for Elysia.js via i18next",
   "repository": {
     "type": "git",
@@ -35,7 +35,7 @@
     "i18next": "^23.5.1",
     "bun-plugin-dts": "^0.1.0",
     "bun-types": "latest",
-    "elysia": "^0.7.1",
+    "elysia": "^1.0.5",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2"
   },
