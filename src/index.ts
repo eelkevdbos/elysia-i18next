@@ -35,7 +35,7 @@ export function newLanguageDetector(opts: LanguageDetectorOptions): LanguageDete
 
     const cookie = set.cookie ? set.cookie[opts.cookieName] : null
     if (cookie && cookie.value) {
-      return cookie.value
+      return cookie.value as string
     }
 
     if (params && opts.pathParamName in params) {
@@ -82,7 +82,7 @@ export const i18next = (userOptions: Partial<I18NextPluginOptions>) => {
     })
     .onBeforeHandle({ as: "global" }, async ctx => {
       const lng = await options.detectLanguage(ctx)
-      if (lng) {
+      if (typeof lng === 'string') {
         await _instance.changeLanguage(lng)
       }
     })
