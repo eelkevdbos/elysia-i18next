@@ -25,7 +25,7 @@ export type LanguageDetector<
 > = (ctx: T) => null | string | Promise<string | null>
 
 export function newLanguageDetector(opts: LanguageDetectorOptions): LanguageDetector {
-  return ({ set, request, params, store }) => {
+  return ({ cookie, request, params, store }) => {
     const url = new URL(request.url)
 
     const searchParamValue = url.searchParams.get(opts.searchParamName)
@@ -33,9 +33,9 @@ export function newLanguageDetector(opts: LanguageDetectorOptions): LanguageDete
       return searchParamValue
     }
 
-    const cookie = set.cookie ? set.cookie[opts.cookieName] : null
-    if (cookie && cookie.value) {
-      return cookie.value as string
+    const _cookie = cookie ? cookie[opts.cookieName] : null
+    if (_cookie && _cookie.value) {
+      return _cookie.value as string
     }
 
     if (params && opts.pathParamName in params) {
